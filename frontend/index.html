@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicConnect — Smart Citizen Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar Overlay for Mobile -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <!-- App Sidebar -->
+    <aside id="app-sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <span class="brand-icon">🏛️</span>
+          <div>
+            <div class="brand-name">CivicConnect</div>
+            <span class="brand-badge">Phase 1</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#dashboard" class="nav-item active">
+          <span>📊</span>
+          <span>Citizen Dashboard</span>
+        </a>
+        <div class="nav-item disabled" title="Planned for Phase 2 (Spring Boot + MySQL)">
+          <span>🛡️</span>
+          <span>Admin Portal</span>
+          <span class="nav-badge">Phase 2</span>
+        </div>
+        <div class="nav-item disabled" title="Planned for Phase 2 (Department Staff Workflow)">
+          <span>👷</span>
+          <span>Staff Portal</span>
+          <span class="nav-badge">Phase 2</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="demo-indicator">
+          <span class="pulsing-dot"></span>
+          <span>Demo Local Storage</span>
+        </div>
+        <button id="reset-demo-btn" class="btn-sidebar-reset" title="Reset complaints to sample demo state">
+          <span>🔄</span> Reset Demo Data
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <!-- Top Application Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button id="sidebar-toggle" class="sidebar-toggle-btn" aria-label="Toggle navigation menu">
+            ☰
+          </button>
+          <div class="header-title">Citizen Grievance Portal</div>
+        </div>
+
+        <div class="header-right">
+          <button id="open-report-btn" class="btn btn-primary">
+            <span>➕</span> Report an Issue
+          </button>
+          <div class="user-profile-badge">
+            <div class="user-avatar">JD</div>
+            <div class="user-info">
+              <span class="user-name">John Doe (Citizen)</span>
+              <span class="user-role">Resident Voter</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Main Content -->
+      <main class="dashboard-content">
+        <!-- Page Intro Banner -->
+        <section class="page-intro">
+          <h1 class="page-title">Citizen Grievance Dashboard</h1>
+          <p class="page-subtitle">Report public infrastructure and civic issues in your area, and track resolution in real time.</p>
+        </section>
+
+        <!-- Stats Overview Cards Grid -->
+        <section class="stats-grid">
+          <div class="stat-card stat-card-total">
+            <div class="stat-content">
+              <span class="stat-label">Total Complaints</span>
+              <span id="stat-total" class="stat-number">0</span>
+            </div>
+            <div class="stat-icon">📋</div>
+          </div>
+
+          <div class="stat-card stat-card-pending">
+            <div class="stat-content">
+              <span class="stat-label">Pending</span>
+              <span id="stat-pending" class="stat-number">0</span>
+            </div>
+            <div class="stat-icon">⏳</div>
+          </div>
+
+          <div class="stat-card stat-card-inprogress">
+            <div class="stat-content">
+              <span class="stat-label">In Progress</span>
+              <span id="stat-inprogress" class="stat-number">0</span>
+            </div>
+            <div class="stat-icon">⚙️</div>
+          </div>
+
+          <div class="stat-card stat-card-resolved">
+            <div class="stat-content">
+              <span class="stat-label">Resolved</span>
+              <span id="stat-resolved" class="stat-number">0</span>
+            </div>
+            <div class="stat-icon">✅</div>
+          </div>
+        </section>
+
+        <!-- Search & Filter Controls -->
+        <section class="filter-section">
+          <div class="filter-bar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input 
+                type="text" 
+                id="search-input" 
+                class="search-input" 
+                placeholder="Search by Complaint ID, title, category, or location..."
+                aria-label="Search complaints"
+              >
+            </div>
+
+            <div class="filter-group">
+              <select id="filter-category" class="filter-select" aria-label="Filter by Category">
+                <option value="All">All Categories</option>
+                <option value="Road Damage">🚧 Road Damage</option>
+                <option value="Garbage">🗑️ Garbage</option>
+                <option value="Streetlight">💡 Streetlight</option>
+                <option value="Water Leakage">🚰 Water Leakage</option>
+                <option value="Other">📌 Other</option>
+              </select>
+
+              <select id="filter-status" class="filter-select" aria-label="Filter by Status">
+                <option value="All">All Statuses</option>
+                <option value="Pending">⏳ Pending</option>
+                <option value="In Progress">⚙️ In Progress</option>
+                <option value="Resolved">✅ Resolved</option>
+              </select>
+
+              <button id="clear-filters-btn" class="btn btn-secondary btn-sm" title="Clear all active filters">
+                Clear Filters
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-status-row">
+            <span id="results-count">Loading complaints...</span>
+            <span>Tip: Click any complaint card to view complete issue details and photo</span>
+          </div>
+        </section>
+
+        <!-- Complaints Cards List -->
+        <section>
+          <div class="section-header">
+            <h2 class="section-title">Recent Public Grievances</h2>
+          </div>
+          <div id="complaint-list-container" class="complaint-grid">
+            <!-- Dynamic Complaint Cards will be injected here -->
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Modal 1: Report a Complaint Form Modal
+       ========================================================================== -->
+  <div id="report-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="report-modal-title">Report a Civic Complaint</h3>
+        <button id="close-report-modal" class="modal-close-btn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div id="form-alert" class="form-alert hidden" role="alert"></div>
+
+        <form id="complaint-form" novalidate>
+          <!-- Title -->
+          <div class="form-group">
+            <label for="input-title" class="form-label">
+              Complaint Title <span class="required-star">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="input-title" 
+              class="form-control" 
+              placeholder="e.g. Broken water pipeline on main road"
+              maxlength="100"
+              required
+            >
+            <span id="title-error" class="field-error hidden"></span>
+            <small class="form-hint">Brief summary of the issue (minimum 5 characters)</small>
+          </div>
+
+          <!-- Category -->
+          <div class="form-group">
+            <label for="input-category" class="form-label">
+              Category <span class="required-star">*</span>
+            </label>
+            <select id="input-category" class="form-control" required>
+              <option value="">-- Select Category --</option>
+              <option value="Road Damage">Road Damage (Potholes, Broken Pavements)</option>
+              <option value="Garbage">Garbage (Overflowing Dumpsters, Uncleaned Streets)</option>
+              <option value="Streetlight">Streetlight (Fused Bulbs, Broken Poles)</option>
+              <option value="Water Leakage">Water Leakage (Pipeline Burst, Contaminated Supply)</option>
+              <option value="Other">Other Civic Issues</option>
+            </select>
+            <span id="category-error" class="field-error hidden"></span>
+          </div>
+
+          <!-- Location -->
+          <div class="form-group">
+            <label for="input-location" class="form-label">
+              Location / Landmark <span class="required-star">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="input-location" 
+              class="form-control" 
+              placeholder="e.g. Near Community Hall, Sector 12, MG Road"
+              maxlength="150"
+              required
+            >
+            <span id="location-error" class="field-error hidden"></span>
+            <small class="form-hint">Accurate address or nearest landmark</small>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="input-description" class="form-label">
+              Detailed Description <span class="required-star">*</span>
+            </label>
+            <textarea 
+              id="input-description" 
+              class="form-control" 
+              rows="4" 
+              placeholder="Describe the issue in detail, how long it has been persisting, and how it impacts the area..."
+              maxlength="1000"
+              required
+            ></textarea>
+            <span id="description-error" class="field-error hidden"></span>
+            <small class="form-hint">Minimum 10 characters</small>
+          </div>
+
+          <!-- Optional Photo Attachment -->
+          <div class="form-group">
+            <label class="form-label">
+              Photo Evidence <small>(Optional — JPG, PNG, WebP up to 2MB)</small>
+            </label>
+            <div class="photo-upload-box">
+              <input 
+                type="file" 
+                id="input-photo" 
+                class="file-input" 
+                accept="image/jpeg,image/png,image/webp,image/jpg"
+                capture="environment"
+              >
+              <label for="input-photo" class="photo-upload-label">
+                <span class="photo-upload-icon">📷</span>
+                <span class="photo-upload-title">Click to upload photo or capture with camera</span>
+                <small class="form-hint">Images are automatically resized for local demo storage</small>
+              </label>
+            </div>
+            <span id="photo-error" class="field-error hidden"></span>
+
+            <!-- Photo Preview -->
+            <div id="photo-preview-container" class="photo-preview-card hidden">
+              <img id="photo-preview-img" src="" alt="Selected photo preview" class="photo-preview-thumb">
+              <div class="photo-preview-info">
+                <span id="photo-preview-name" class="photo-preview-name"></span>
+                <small class="form-hint">Ready for submission</small>
+              </div>
+              <button type="button" id="remove-photo-btn" class="btn-remove-photo">Remove</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="cancel-report-btn" class="btn btn-secondary">Cancel</button>
+        <button type="submit" form="complaint-form" id="submit-report-btn" class="btn btn-primary">
+          Submit Complaint
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Modal 2: Complaint Details & Tracking Modal
+       ========================================================================== -->
+  <div id="details-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="details-modal-title">
+    <div class="modal-dialog modal-dialog-large">
+      <div class="modal-header">
+        <h3 id="details-modal-title">Complaint Tracking & Details</h3>
+        <button id="close-details-modal" class="modal-close-btn" aria-label="Close modal">&times;</button>
+      </div>
+      <div id="details-modal-body" class="modal-body">
+        <!-- Injected dynamically by detailsModal.js -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('details-modal').classList.add('hidden'); document.body.classList.remove('modal-open');">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Modal 3: Reset Demo Data Confirmation Modal
+       ========================================================================== -->
+  <div id="reset-confirm-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-header">
+        <h3 id="reset-modal-title">Reset Demo Data?</h3>
+        <button id="close-reset-modal" class="modal-close-btn" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 0.75rem;">Kya aap sach me demo complaints ko initial state par restore karna chahte hain?</p>
+        <p style="font-size: 0.85rem; color: #ef4444;">⚠️ Is action se aapki add ki hui sabhi nayi complaints delete ho jayengi aur standard 4 sample complaints wapas set ho jayengi.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cancel-reset-btn" class="btn btn-secondary">Cancel</button>
+        <button type="button" id="confirm-reset-btn" class="btn btn-danger">Yes, Reset Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- ES Modules Entrypoint -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
